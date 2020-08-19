@@ -1,0 +1,23 @@
+.blackTile {
+    width: 40px;
+    height: 40px;
+    background-color: gray;
+    font-size: 30px;
+    cursor: grab;
+}
+
+.grayTile {
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
+    background-color: #eeeeee;
+    cursor: grab;
+}
+
+.whitePiece{
+
+}
+
+.blackPiece{
+
+}
