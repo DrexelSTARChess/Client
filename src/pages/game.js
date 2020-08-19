@@ -10,18 +10,13 @@ class Game extends Component {
         this.props.history.push("/");
     }
 
-    move = (event, data) => {
-        console.log("MOVED");
-        console.log(data);
-    }
-
     render() {
         return (
             <div>
                 <h1>YOU ARE INSIDE THE GAME</h1>
                 <p>PLAY SOME CHESS</p>
 
-                <BoardComponent isPressed={this.move} />
+                <BoardComponent />
 
                 <ButtonComponent
                     label={"Quit"}
