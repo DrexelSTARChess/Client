@@ -126,7 +126,19 @@ let testMoveData = [
         pieceName: "blackKing",
         tileCoord: [4, 0],
         possibleMoves: [[0, 0]],
-        isSpecial: true
+        isSpecial: true,
+        specialMove: [
+            {
+                pieceName: "rook",
+                tileCoord: [0, 0],
+                newPosition: [4, 0]
+            },
+            {
+                pieceName: "king",
+                tileCoord: [4, 0],
+                newPosition: [0, 0]
+            }
+        ]
     }
 ]
 
