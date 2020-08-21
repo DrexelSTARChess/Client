@@ -6,55 +6,60 @@ import axios from "axios";
 
 
 function simple() {
-    //fetch('http://173.59.121.16:5000/startGame', { method: 'GET' }).then(function (response) {
-    //    console.log(response);
-    //    return response.json();
-
-    //}).then(function (data) {
-    //    console.log(data);
-    //});
-
-    //fetch('http://127.0.0.1:5000/startGame', { method: 'GET' }).then(function (response) {
-    //    console.log(response);
-    //    return response.json();
-
-    //}).then(function (data) {
-    //    console.log(data["player_number"]);
-    //    fetch('http://127.0.0.1:5000/waitForPlayer/1', { method: 'GET' }).then(function (response) {
-    //        console.log(response);
-
-    //    });
-    //});
-
-    axios.get('http://127.0.0.1:5000/startGame')
-        .then(function (response) {
-            return response.data;
 
 
-        }).then(function (data) {
-            console.log(data);
+    fetch('http://127.0.0.1:5000/startGame', { method: 'GET' }).then(function (response) {
+        console.log(response);
+        return response.json();
+
+    }).then(function (data) {
+
+        console.log(data["player_number"]);
+        let dataa = { player_number: data["player_number"] };
+        fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataa) }).then(function (response) {
+            console.log(response);
+        });
 
 
-
-            // ADD WAIT FOR PLAYER HERE
-
-
-        })
-        .catch(function (error){
-        console.log(error);
     });
 
 
 }
 
+let me = this;
+
+async function waitForPlayer(data) {
+    console.log(data["player_number"]);
+    let dataa = { player_number: data["player_number"] };
+    let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataa) }).then(function (response) {
+        console.log(response);
+    });
+    return;
+}
+
 class Home extends Component {
     startGame = (event) => {
-        console.log("Starting game...");
-        this.props.history.push("/Game");
+        this.simpleConnection();
     }
 
-    simpleConnection = () => {
-        simple();
+
+    async waitForPlayer(data) {
+        console.log(data["player_number"]);
+        let dataa = { player_number: data["player_number"] };
+        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataa) }).then(function (response) {
+            console.log(response);
+        });
+    return;
+}
+
+    async simpleConnection() {
+        let response = await fetch('http://127.0.0.1:5000/startGame', { method: 'GET' })
+        let data = await response.json();
+        let waitResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+
+        console.log("WOWOWOWO " + waitResponse);
+        this.props.history.push("/Game");
+
     }
 
     render() {
@@ -66,7 +71,7 @@ class Home extends Component {
 
                 <ButtonComponent
                     label={"Start Game"}
-                    isPressed={this.simpleConnection}
+                    isPressed={this.startGame}
                 />
             </div>
         );

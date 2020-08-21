@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from "react-router-dom";
 import ButtonComponent from '../components/ButtonComponent';
 import BoardComponent from '../components/BoardComponent';
-
+import axios from "axios";
 
 class Game extends Component {
     quitGame = (event) => {
@@ -20,6 +20,11 @@ class Game extends Component {
 
                 <ButtonComponent
                     label={"Quit"}
+                    isPressed={this.quitGame}
+                />
+
+                <ButtonComponent
+                    label={"PSEUDO MOVE"}
                     isPressed={this.quitGame}
                 />
             </div>
