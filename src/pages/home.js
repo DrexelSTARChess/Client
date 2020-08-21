@@ -6,16 +6,45 @@ import axios from "axios";
 
 
 function simple() {
-    fetch('http://173.59.121.16:5000/', { method: 'GET' }).then(function (response) {
-        console.log(response);
-        return response.text();
-    }).then(function (data) {
-        console.log(data);
+    //fetch('http://173.59.121.16:5000/startGame', { method: 'GET' }).then(function (response) {
+    //    console.log(response);
+    //    return response.json();
+
+    //}).then(function (data) {
+    //    console.log(data);
+    //});
+
+    //fetch('http://127.0.0.1:5000/startGame', { method: 'GET' }).then(function (response) {
+    //    console.log(response);
+    //    return response.json();
+
+    //}).then(function (data) {
+    //    console.log(data["player_number"]);
+    //    fetch('http://127.0.0.1:5000/waitForPlayer/1', { method: 'GET' }).then(function (response) {
+    //        console.log(response);
+
+    //    });
+    //});
+
+    axios.get('http://127.0.0.1:5000/startGame')
+        .then(function (response) {
+            return response.data;
+
+
+        }).then(function (data) {
+            console.log(data);
+
+
+
+            // ADD WAIT FOR PLAYER HERE
+
+
+        })
+        .catch(function (error){
+        console.log(error);
     });
 
-    //axios.get('http://173.59.121.16:5000/').then(function (response) {
-    //    console.log(response);
-    //});
+
 }
 
 class Home extends Component {
@@ -37,7 +66,7 @@ class Home extends Component {
 
                 <ButtonComponent
                     label={"Start Game"}
-                    isPressed={this.startGame}
+                    isPressed={this.simpleConnection}
                 />
             </div>
         );

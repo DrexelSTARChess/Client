@@ -62,13 +62,19 @@ let exampleJSONDataFromServer =
         {
             pieceName: "blackPawn",
             tileCoord: [0, 1],
-            possibleMoves: [[0, 2], [0, 3]]
+            possibleMoves: [[0, 2], [0, 3]],
+            tileThatCausesSpecialMove: [],
+            specialMove: [],
+            specialType: ""
         },
 
         {
             pieceName: "blackPawn",
             tileCoord: [1, 1],
-            possibleMoves: [[1, 2], [1, 3]]
+            possibleMoves: [[1, 2], [1, 3]],
+            tileThatCausesSpecialMove: [],
+            specialMove: [],
+            specialType: ""
         }
     ]
 }
@@ -77,68 +83,112 @@ let testMoveData = [
     {
         pieceName: "blackPawn",
         tileCoord: [0, 1],
-        possibleMoves: [[0, 2], [0, 3]]
+        possibleMoves: [[0, 2], [0, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [1, 1],
-        possibleMoves: [[1, 2], [1, 3]]
+        possibleMoves: [[1, 2], [1, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [2, 1],
-        possibleMoves: [[2, 2], [2, 3]]
+        possibleMoves: [[2, 2], [2, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [3, 1],
-        possibleMoves: [[3, 2], [3, 3]]
+        possibleMoves: [[3, 2], [3, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [4, 1],
-        possibleMoves: [[4, 2], [4, 3]]
+        possibleMoves: [[4, 2], [4, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [5, 1],
-        possibleMoves: [[5, 2], [5, 3]]
+        possibleMoves: [[5, 2], [5, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [6, 1],
-        possibleMoves: [[6, 2], [6, 3]]
+        possibleMoves: [[6, 2], [6, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
     {
         pieceName: "blackPawn",
         tileCoord: [7, 1],
-        possibleMoves: [[7, 2], [7, 3]]
+        possibleMoves: [[7, 2], [7, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
     },
 
+    // Example of castling
     {
         pieceName: "blackKing",
         tileCoord: [4, 0],
         possibleMoves: [[0, 0]],
-        isSpecial: true,
+        tileThatCausesSpecialMove: [[0, 0]],
         specialMove: [
             {
-                pieceName: "rook",
-                tileCoord: [0, 0],
-                newPosition: [4, 0]
+                effectedTile: [4, 0],
+                newPiece: "rook"
             },
             {
-                pieceName: "king",
-                tileCoord: [4, 0],
-                newPosition: [0, 0]
+                effectedTile: [0, 0],
+                newPiece: "king"
             }
-        ]
+        ], 
+        specialType: "castling"
+    },
+
+    // Example of piece with no special moves
+    {
+        pieceName: "blackPawn",
+        tileCoord: [7, 1],
+        possibleMoves: [[7, 2], [7, 3]],
+        tileThatCausesSpecialMove: [],
+        specialMove: [],
+        specialType: ""
+    },
+
+    // Example of piece promotion
+    {
+        pieceName: "whitePawn",
+        tileCoord: [0, 0],
+        possibleMoves: [[0, 0]],
+        tileThatCausesSpecialMove: [[0, 0]],
+        specialMove: [],
+        specialType: "promotion"
     }
 ]
 
