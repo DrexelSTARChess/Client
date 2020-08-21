@@ -5,38 +5,6 @@ import { createBrowserHistory } from 'history';
 import axios from "axios";
 
 
-function simple() {
-
-
-    fetch('http://127.0.0.1:5000/startGame', { method: 'GET' }).then(function (response) {
-        console.log(response);
-        return response.json();
-
-    }).then(function (data) {
-
-        console.log(data["player_number"]);
-        let dataa = { player_number: data["player_number"] };
-        fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataa) }).then(function (response) {
-            console.log(response);
-        });
-
-
-    });
-
-
-}
-
-let me = this;
-
-async function waitForPlayer(data) {
-    console.log(data["player_number"]);
-    let dataa = { player_number: data["player_number"] };
-    let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataa) }).then(function (response) {
-        console.log(response);
-    });
-    return;
-}
-
 class Home extends Component {
     startGame = (event) => {
         this.simpleConnection();
@@ -45,20 +13,29 @@ class Home extends Component {
 
     async waitForPlayer(data) {
         console.log(data["player_number"]);
-        let dataa = { player_number: data["player_number"] };
-        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataa) }).then(function (response) {
+        let playerNumber = { player_number: data["player_number"] };
+        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playerNumber) }).then(function (response) {
             console.log(response);
         });
-    return;
-}
+        return;
+    }
 
     async simpleConnection() {
         let response = await fetch('http://127.0.0.1:5000/startGame', { method: 'GET' })
         let data = await response.json();
-        let waitResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        let player_number_data = { player_number: data["player_number"] }
+        console.log(player_number_data);
+        let waitResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(player_number_data) })
 
         console.log("WOWOWOWO " + waitResponse);
-        this.props.history.push("/Game");
+        this.props.history.push(
+            {
+                pathname: "/Game",
+                state: {
+                    playerNumber: player_number_data["player_number"]
+                }
+            }
+        );
 
     }
 
