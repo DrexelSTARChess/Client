@@ -12,32 +12,35 @@ class Home extends Component {
 
 
     async waitForPlayer(data) {
-        console.log(data["player_number"]);
+        //console.log(data["player_number"]);
         let playerNumber = { player_number: data["player_number"] };
-        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playerNumber) }).then(function (response) {
-            console.log(response);
-        });
+        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playerNumber) });
         return;
     }
+
 
     async simpleConnection() {
         let response = await fetch('http://127.0.0.1:5000/startGame', { method: 'GET' })
         let data = await response.json();
         let player_number_data = { player_number: data["player_number"] }
-        console.log(player_number_data);
+        //console.log(player_number_data);
         let waitResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(player_number_data) })
+        let waitResponseJson = await waitResponse.json();
 
-        console.log("WOWOWOWO " + waitResponse);
+        let startingMoves = waitResponseJson.move_data;
+
         this.props.history.push(
             {
                 pathname: "/Game",
                 state: {
-                    playerNumber: player_number_data["player_number"]
+                    playerNumber: player_number_data["player_number"],
+                    startMoves: startingMoves
                 }
             }
         );
 
     }
+
 
     render() {
         return (

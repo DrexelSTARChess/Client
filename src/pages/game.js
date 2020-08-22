@@ -6,29 +6,29 @@ import axios from "axios";
 
 class Game extends Component {
     componentDidMount = () => {
-        //console.log(this.props.location.state.playerNumber);
+        //console.log("STARTING GAME AS PLAYER: " + this.props.location.state.playerNumber);
     }
 
-    quitGame = (event) => {
+    quitGame = (event, roundResult) => {
         console.log("Quitting...");
-        console.log(this.props.history);
-        this.props.history.push("/");
+        //console.log(this.props.history);
+        this.props.history.push(
+            {
+                pathname: "/Final",
+                state: { result: roundResult}
+            }
+        );
     }
-
-    //async makeMove() {
-    //    //let data = { player_number: this.props.location.state.playerNumber};
-    //    //let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-
-    //}
 
     render() {
         return (
             <div>
                 <h1>YOU ARE INSIDE THE GAME</h1>
-                <p>PLAY SOME CHESS</p>
 
                 <BoardComponent
-                    playerNumber={this.props.location.state.playerNumber} quitGamePress={this.quitGame}/>
+                    playerNumber={this.props.location.state.playerNumber}
+                    quitGamePress={this.quitGame}
+                    startMoves={this.props.location.state.startMoves}/>
 
 
             </div>
