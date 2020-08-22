@@ -45,6 +45,7 @@ let boardData = [
 ];
 
 
+// NOTE: This will only work for one move right now, you will need a constant input of data to keep making moves
 let testMoveData = [
     {
         pieceName: "blackPawn",
@@ -225,7 +226,6 @@ class BoardComponent extends Component {
             this.makeMoveConnection(this.props.playerNumber);
         }
         else {
-            this.state.tileComponents[0][1].current.setPiece(whiteRook);
             console.log("IT IS NOT YOUR TURN");
         }
     }
