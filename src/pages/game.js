@@ -8,8 +8,10 @@ class Game extends Component {
     componentDidMount = () => {
         //console.log(this.props.location.state.playerNumber);
     }
+
     quitGame = (event) => {
         console.log("Quitting...");
+        console.log(this.props.history);
         this.props.history.push("/");
     }
 
@@ -26,12 +28,9 @@ class Game extends Component {
                 <p>PLAY SOME CHESS</p>
 
                 <BoardComponent
-                    playerNumber={this.props.location.state.playerNumber}/>
+                    playerNumber={this.props.location.state.playerNumber} quitGamePress={this.quitGame}/>
 
-                <ButtonComponent
-                    label={"Quit"}
-                    isPressed={this.quitGame}
-                />
+
             </div>
         );
     }

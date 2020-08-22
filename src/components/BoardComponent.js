@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import TileComponent from '../components/TileComponent';
 import ButtonComponent from '../components/ButtonComponent';
+import { createBrowserHistory } from 'history';
 import './board.css';
 
 let whiteKing = '\u2654';
@@ -19,20 +20,8 @@ let noPiece = '';
 // possibly add highlights, need to find a way to reference each individual tile component by coordinate
 
 
-// these variables permeate
-//let initialBoardData = [
-//    ["blackRook", "blackKnight", "blackBishop", "blackQueen", "blackKing", "blackBishop", "blackKnight", "blackRook"],
-//    ["blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn"],
-//    ["noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece"],
-//    ["noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece"],
-//    ["noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece"],
-//    ["noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece"],
-//    ["whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn", "whitePawn"],
-//    ["whiteRook", "whiteKnight", "whiteBishop", "whiteQueen", "whiteKing", "whiteBishop", "whiteKnight", "whiteRook"]
-//]
-
 let initialBoardData = [
-    ["blackRook", "noPiece", "noPiece", "noPiece", "blackKing", "noPiece", "noPiece", "blackRook"],
+    ["blackRook", "blackKnight", "blackBishop", "blackQueen", "blackKing", "blackBishop", "blackKnight", "blackRook"],
     ["blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn", "blackPawn"],
     ["noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece"],
     ["noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece", "noPiece"],
@@ -147,8 +136,10 @@ let testMoveData = [
             {
                 // Link Special move coordinate to special move
                 specialTile: [1, 0],
+
                 // name of special move
                 specialMoveType: "castling",
+
                 // Data that holds coordinate changes for special move
                 effectedTiles:[
                     { tileCoord: [2, 0], newPiece: "blackRook" },
@@ -170,31 +161,10 @@ let testMoveData = [
             }
         ], 
     },
-
-    // Example of piece with no special moves
-    {
-        pieceName: "blackPawn",
-        tileCoord: [7, 1],
-        possibleMoves: [[7, 2], [7, 3]],
-        tileThatCausesSpecialMove: [],
-        specialMove: [],
-        specialType: ""
-    },
-
-    // Example of piece promotion
-    {
-        pieceName: "whitePawn",
-        tileCoord: [0, 0],
-        possibleMoves: [[0, 0]],
-        tileThatCausesSpecialMove: [[0, 0]],
-        specialMove: [],
-        specialType: "promotion"
-    }
 ]
 
-let currentValidMoves = [];
+let currentValidMoves = {possibleMoves: []};
 let currentPiece = '';
-let previousTarget = null;
 let previousCoord = [];
 
 function doesTwoDInclude(twoarr, arr) {
@@ -237,8 +207,16 @@ let conversion = {
 class BoardComponent extends Component {
     constructor() {
         super();
-        this.state = { freeze: false , tileComponents: []};
+        this.state = { freeze: false, tileComponents: [], isSelect: true };
     }
+
+
+    componentDidMount = () => {
+        if (this.props.playerNumber == 2) {
+            this.makeMove();
+        }
+    }
+
 
     makeMove = () => {
         if (!this.state.freeze) {
@@ -253,10 +231,9 @@ class BoardComponent extends Component {
     }
 
 
-    //testing connection
     async makeMoveConnection(playerNumber) {
         // send board
-        let data = { player_number: playerNumber, board: boardData};
+        let data = { player_number: playerNumber, board: boardData };
         let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
 
         // send wait request
@@ -268,38 +245,52 @@ class BoardComponent extends Component {
         console.log(waitResponseJson);
         this.state.freeze = false;
 
+        if (waitResponseJson.won == true || waitResponseJson.lost == true) {
+            this.quitGame();
+        }
+
+
     }
 
 
-    moveLogic = (event, clickedCoord) => {
-        // logic for selecting correct piece
-        for (let i = 0; i < testMoveData.length; i++)
-        {
+    clearMoveData = () => {
+        previousCoord = [];
+        currentPiece = '';
+        currentValidMoves.possibleMoves = [];
+        testMoveData = [];
+        console.log(testMoveData);
+    }
+
+
+    selectPiece = (event, clickedCoord) => {
+        for (let i = 0; i < testMoveData.length; i++) {
             if (areArraysEqual(clickedCoord, testMoveData[i].tileCoord)) {
                 console.log("valid SPACE!");
-                previousTarget = event.target;
                 previousCoord = testMoveData[i].tileCoord;
                 //currentValidMoves = testMoveData[i].possibleMoves;
                 currentValidMoves = testMoveData[i];
                 currentPiece = testMoveData[i].pieceName;
+                this.state.isSelect = false;
                 return
             }
         }
+        console.log("invalid selection");
+        return;
+    }
 
 
-        // selecting valid tile, updating css, and sending new board
-
+    selectMovement = (clickedCoord) => {
         let vanillaMoves = currentValidMoves.possibleMoves;
-
         for (let x = 0; x < vanillaMoves.length; x++) {
             if (areArraysEqual(clickedCoord, vanillaMoves[x])) {
 
                 let tilesThatCauseSpecialMove = currentValidMoves.tileThatCausesSpecialMove;
-                console.log( tilesThatCauseSpecialMove);
+                console.log(tilesThatCauseSpecialMove);
 
 
                 if (doesTwoDInclude(tilesThatCauseSpecialMove, clickedCoord)) {
-                    console.log("SPECIAL MOVE");   
+                    console.log("SPECIAL MOVE");
+                    this.clearMoveData();
                 }
                 else {
                     console.log("made a move!");
@@ -314,19 +305,25 @@ class BoardComponent extends Component {
                     // actually changes the image
                     this.updateBoard();
 
-                    // clears move data
-                    previousCoord = [];
-                    currentPiece = '';
-                    currentValidMoves = [];
-                    testMoveData = [];
+                    //clears board data
+                    this.clearMoveData();
                 }
-
+                this.state.isSelect = true;
                 return
             }
         }
+        console.log("invalid choice");
+        return;
+    }
 
-        console.log("not valid Space!");
-        return
+
+    moveLogic = (event, clickedCoord) => {
+        if (this.state.isSelect) {
+            this.selectPiece(event, clickedCoord);
+        }
+        else {
+            this.selectMovement(clickedCoord);
+        }
     }
 
 
@@ -399,6 +396,15 @@ class BoardComponent extends Component {
     }
 
 
+    quitGame = () => {
+        if (!this.state.freeze) {
+            let playerNumber = this.props.playerNumber
+            let data = { player_number: playerNumber };
+            let newResponse = fetch('http://127.0.0.1:5000/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+            this.props.quitGamePress();
+        }
+    }
+
     render() {
         return (
             <div>
@@ -407,6 +413,10 @@ class BoardComponent extends Component {
                     <ButtonComponent
                         label={"PSEUDO MOVE"}
                         isPressed={this.makeMove}
+                    />
+                    <ButtonComponent
+                        label={"Quit"}
+                        isPressed={this.quitGame}
                     />
                 </div>
             </div>
