@@ -5,27 +5,38 @@ import { createBrowserHistory } from 'history';
 import axios from "axios";
 
 
-function simple() {
-    fetch('http://173.59.121.16:5000/', { method: 'GET' }).then(function (response) {
-        console.log(response);
-        return response.text();
-    }).then(function (data) {
-        console.log(data);
-    });
-
-    //axios.get('http://173.59.121.16:5000/').then(function (response) {
-    //    console.log(response);
-    //});
-}
-
 class Home extends Component {
     startGame = (event) => {
-        console.log("Starting game...");
-        this.props.history.push("/Game");
+        this.simpleConnection();
     }
 
-    simpleConnection = () => {
-        simple();
+
+    async waitForPlayer(data) {
+        console.log(data["player_number"]);
+        let playerNumber = { player_number: data["player_number"] };
+        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playerNumber) }).then(function (response) {
+            console.log(response);
+        });
+        return;
+    }
+
+    async simpleConnection() {
+        let response = await fetch('http://127.0.0.1:5000/startGame', { method: 'GET' })
+        let data = await response.json();
+        let player_number_data = { player_number: data["player_number"] }
+        console.log(player_number_data);
+        let waitResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(player_number_data) })
+
+        console.log("WOWOWOWO " + waitResponse);
+        this.props.history.push(
+            {
+                pathname: "/Game",
+                state: {
+                    playerNumber: player_number_data["player_number"]
+                }
+            }
+        );
+
     }
 
     render() {
