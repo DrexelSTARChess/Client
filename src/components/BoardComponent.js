@@ -221,6 +221,7 @@ let conversion = {
 let currentValidMoves = { possibleMoves: [] };
 let currentPiece = '';
 let previousCoord = [];
+//let newPromotion = [];
 
 
 class BoardComponent extends Component {
@@ -228,6 +229,7 @@ class BoardComponent extends Component {
         super();
         this.state = {
             freeze: false,
+            isPromote: false,
             tileComponents: [],
             timeToSelect: true,
             timeToMove: false,
@@ -340,6 +342,8 @@ class BoardComponent extends Component {
         data = { player_number: playerNumber, board: boardData, player_move: moveData };
         let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
         let newResponseJson = await newResponse.json();
+        console.log("SEND BOARD RETURN vvvvvvv");
+        console.log(newResponseJson);
         boardData = newResponseJson["board_data"];
         this.updateBoard();
     }
@@ -474,6 +478,30 @@ class BoardComponent extends Component {
                 }
                 else {
                     console.log("made a move!");
+                    console.log(clickedCoord);
+                    if ((clickedCoord[1] == 0) && (currentPiece == "whitePawn")) {
+                        console.log("WHITE PROMOTION");
+                        this.setState({ isPromote: true });
+                        // changes the core board data
+                        boardData[previousCoord[1]][previousCoord[0]] = "noPiece";
+                        boardData[clickedCoord[1]][clickedCoord[0]] = currentPiece;
+
+                        // actually changes the image
+                        this.updateBoard();
+                        return;
+                    }
+
+                    else if ((clickedCoord[1] == 7) && (currentPiece == "blackPawn")) {
+                        console.log("BLACK PROMOTION");
+                        this.setState({ isPromote: true });
+                        // changes the core board data
+                        boardData[previousCoord[1]][previousCoord[0]] = "noPiece";
+                        boardData[clickedCoord[1]][clickedCoord[0]] = currentPiece;
+
+                        // actually changes the image
+                        this.updateBoard();
+                        return;
+                    }                   
 
                     // changes the core board data
                     boardData[previousCoord[1]][previousCoord[0]] = "noPiece";
@@ -589,6 +617,52 @@ class BoardComponent extends Component {
     }
 
 
+    promoteKnight = () => {
+        console.log("Promoted to Knight!");
+        //newPromotion = [10, 10];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove([20, 20]);
+    }
+
+
+    promoteBishop = () =>  {
+        console.log("Promoted to Bishop!");
+        //newPromotion = [20, 20];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove([30, 30]);
+    }
+
+
+    promoteRook = () =>  {
+        console.log("Promoted to Rook!");
+        //newPromotion = [30, 30];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove([40, 40]);
+    }
+
+
+    promoteQueen = () =>  {
+        console.log("Promoted to Queen!");
+        //console.log(this.state);
+        //newPromotion = [40, 40];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove([50, 50]); // setup await? lookout for this, sketchyy...
+    }
+
+
+    async promotionMove(newPromotion) {
+
+        // prepare for server using meta data
+        let sendToServerMove = [previousCoord[1], previousCoord[0], newPromotion[1], newPromotion[0]]
+
+        //clears meta board data
+        this.clearMoveData();
+
+        // send to server
+        await this.makeMove(sendToServerMove);
+    }
+
+    // TODO turn the link into a div and turn into css rather than button 
     render() {
         return (
             <div>
@@ -596,19 +670,28 @@ class BoardComponent extends Component {
                 <h2>{this.state.turnIndication}</h2>
                 {this.state.htmlBoard}
                 <div>
+                    {
+                        this.state.isPromote
+                            ? <div>
+                                <p>SELECT PIECE TO PROMOTE TO</p>
+                                <table className="promotion">
+                                <tbody>
+                                        <tr className="promotionTr">
+                                            <th className="promotionTh" onClick={this.promoteKnight}>KNIGHT</th>
+                                            <th className="promotionTh" onClick={this.promoteBishop}>BISHOP</th>
+                                            <th className="promotionTh" onClick={this.promoteRook}>ROOK</th>
+                                            <th className="promotionTh" onClick={this.promoteQueen}>QUEEN</th>
+                                        </tr >
+                                </tbody>
+                                </table>
+                                </div>
+                            :<h1> HELLO </h1>
+                    }
 
                     {
                         this.state.freeze
 
-                            ? <Link to={{
-                                pathname: "/Final",
-                                state: { result: "LOST" },
-                            }} onClick={this.quitGame} disabled={this.state.freeze} className="disabledCursor" onClick={(event) => event.preventDefault()}>
-                                <ButtonComponent
-                                    label={"Quit"}
-                                    disabled={this.state.freeze}
-                                />
-                            </Link>
+                            ? <p></p>
 
                             : <Link to={{
                                 pathname: "/Final",
@@ -619,7 +702,8 @@ class BoardComponent extends Component {
                                     disabled={this.state.freeze}
                                 />
                             </Link>
-                     }
+                    }
+
 
 
 

@@ -3,7 +3,7 @@
     height: 40px;
     background-color: gray;
     font-size: 30px;
-    cursor: grab;
+    cursor: pointer;
 }
 
 .grayTile {
@@ -11,7 +11,7 @@
     height: 40px;
     font-size: 30px;
     background-color: #eeeeee;
-    cursor: grab;
+    cursor: pointer;
 }
 
 .highlightBlack {
@@ -19,7 +19,7 @@
     height: 40px;
     font-size: 30px;
     background-color: #ff6600;
-    cursor: grab;
+    cursor: pointer;
 }
 
 .highlightGray {
@@ -27,7 +27,7 @@
     height: 40px;
     font-size: 30px;
     background-color: #FFA07a;
-    cursor: grab;
+    cursor: pointer;
 }
 
 .whitePiece{
