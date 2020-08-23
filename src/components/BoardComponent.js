@@ -289,22 +289,14 @@ class BoardComponent extends Component {
     }
 
 
-    componentDidMount = () => {
+    async componentDidMount() {
         if (this.props.playerNumber == 1) {
-            //this.setState({ currentValidMoves: this.props.startMoves });
             let selectionsAndMoves = this.processMoveData(this.props.startMoves);
             testMoveData = selectionsAndMoves;
-
-            //console.log(selectionsAndMoves);
-            //console.log(selectionsAndMoves["possibleSelections"]);
-
-            //console.log("received data from start game...");
-            //console.log(this.props);
         }
         else if (this.props.playerNumber == 2) {
             this.makeMoveConnection(this.props.playerNumber);
             this.endTurn();
-            //console.log(this.state.turnIndication);
 
         }
         let renderBoard = this.initBoard();
@@ -329,8 +321,8 @@ class BoardComponent extends Component {
            // console.log("PLAYER NUMBER: " + this.props.playerNumber);
             //this.state.freeze = true;
             this.endTurn();
-            this.sendBoard(this.props.playerNumber, moveData);
-            this.makeMoveConnection(this.props.playerNumber);
+            await this.sendBoard(this.props.playerNumber, moveData);
+            await this.makeMoveConnection(this.props.playerNumber);
         }
         else {
             console.log("IT IS NOT YOUR TURN");
@@ -358,11 +350,11 @@ class BoardComponent extends Component {
 
         boardData = waitResponseJson.board_data;
 
-        this.updateBoard();
+        await this.updateBoard();
 
-        testMoveData = this.processMoveData(waitResponseJson.move_data);
+        testMoveData = await this.processMoveData(waitResponseJson.move_data);
 
-        this.startTurn();
+        await this.startTurn();
 
         if (waitResponseJson.won == true) {
             this.quitGame("WON");
