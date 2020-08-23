@@ -240,7 +240,8 @@ class BoardComponent extends Component {
             currentPiece: '',
             previousCoord: [],
             youWin: false,
-            htmlPlayerColor: null
+            htmlPlayerColor: null,
+            isCheck: false
         };
     }
 
@@ -370,7 +371,12 @@ class BoardComponent extends Component {
 
         await this.startTurn();
 
-
+        if (waitResponseJson.is_check == true) {
+            this.setState({ isCheck: true });
+        }
+        else {
+            this.setState({ isCheck: false });
+        }
         if (waitResponseJson.won == true) {
             console.log("???????");
             this.setState({ youWin: true })
@@ -420,9 +426,9 @@ class BoardComponent extends Component {
     clearMoveData = () => {
         previousCoord = [];
         currentPiece = '';
+        saveClickedCoord = [];
         currentValidMoves.possibleMoves = [];
         testMoveData = [];
-        saveClickedCoord = [];
         //console.log(testMoveData);
     }
 
@@ -443,7 +449,7 @@ class BoardComponent extends Component {
                 return isValidSpace;
             }
         }
-        this.turnAllHighlightsOff();
+        //this.turnAllHighlightsOff();
         //console.log("invalid selection");
         return isValidSpace;
     }
@@ -482,6 +488,7 @@ class BoardComponent extends Component {
                 }
                 else {
                     console.log("made a move!");
+                    this.turnAllHighlightsOff();
                     console.log(clickedCoord);
                     saveClickedCoord = clickedCoord
                     if ((clickedCoord[1] == 0) && (currentPiece == "whitePawn")) {
@@ -683,6 +690,11 @@ class BoardComponent extends Component {
             <div>
                 <h1>YOU ARE INSIDE THE GAME</h1>
                 {this.state.htmlPlayerColor}
+                {
+                    this.state.isCheck
+                        ?<h2>YOU ARE IN CHECK</h2>
+                        :<h2></h2>
+                }
                 <h2>{this.state.turnIndication}</h2>
                 {this.state.htmlBoard}
                 <div>
