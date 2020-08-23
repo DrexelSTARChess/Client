@@ -27,3 +27,11 @@ table {
     margin-right: auto;
     border: 4px solid black;
 }
+
+.disabledCursor{
+    cursor: default;
+}
+
+.enabledCursor{
+
+}

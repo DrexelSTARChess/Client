@@ -9,25 +9,25 @@ class Game extends Component {
         //console.log("STARTING GAME AS PLAYER: " + this.props.location.state.playerNumber);
     }
 
-    quitGame = (event, roundResult) => {
-        console.log("Quitting...");
-        //console.log(this.props.history);
-        this.props.history.push(
-            {
-                pathname: "/Final",
-                state: { result: roundResult}
-            }
-        );
-    }
+    //quitGame = (resultPhrase) => {
+    //    console.log(resultPhrase);
+    //    //console.log("ROUND RESULT: " + roundResult);
+    //    console.log("Quitting...");
+    //    //console.log(this.props.history);
+    //    this.props.history.push(
+    //        {
+    //            pathname: "/Final",
+    //            state: { result: resultPhrase}
+    //        }
+    //    );
+    //}
 
     render() {
         return (
             <div>
-                <h1>YOU ARE INSIDE THE GAME</h1>
 
                 <BoardComponent
                     playerNumber={this.props.location.state.playerNumber}
-                    quitGamePress={this.quitGame}
                     startMoves={this.props.location.state.startMoves}/>
 
 

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import TileComponent from '../components/TileComponent';
 import ButtonComponent from '../components/ButtonComponent';
 import { createBrowserHistory } from 'history';
+import { Link } from "react-router-dom";
 import './board.css';
 
 let whiteKing = '\u2654';
@@ -234,7 +235,8 @@ class BoardComponent extends Component {
             currentValidMoves: [],
             currentValidSelections: [],
             currentPiece: '',
-            previousCoord: []
+            previousCoord: [],
+            youWin: false
         };
     }
 
@@ -290,12 +292,14 @@ class BoardComponent extends Component {
 
 
     async componentDidMount() {
-        if (this.props.playerNumber == 1) {
-            let selectionsAndMoves = this.processMoveData(this.props.startMoves);
+        if (this.props.location.state.playerNumber == 1) {
+            //let selectionsAndMoves = this.processMoveData(this.props.startMoves);
+            let selectionsAndMoves = this.processMoveData(this.props.location.state.startMoves);
             testMoveData = selectionsAndMoves;
         }
-        else if (this.props.playerNumber == 2) {
-            this.makeMoveConnection(this.props.playerNumber);
+        else if (this.props.location.state.playerNumber == 2) {
+            //this.makeMoveConnection(this.props.playerNumber);
+            this.makeMoveConnection(this.props.location.state.playerNumber)
             this.endTurn();
 
         }
@@ -321,8 +325,8 @@ class BoardComponent extends Component {
            // console.log("PLAYER NUMBER: " + this.props.playerNumber);
             //this.state.freeze = true;
             this.endTurn();
-            await this.sendBoard(this.props.playerNumber, moveData);
-            await this.makeMoveConnection(this.props.playerNumber);
+            await this.sendBoard(this.props.location.state.playerNumber, moveData);
+            await this.makeMoveConnection(this.props.location.state.playerNumber);
         }
         else {
             console.log("IT IS NOT YOUR TURN");
@@ -335,6 +339,9 @@ class BoardComponent extends Component {
         let data = null;
         data = { player_number: playerNumber, board: boardData, player_move: moveData };
         let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        let newResponseJson = await newResponse.json();
+        boardData = newResponseJson["board_data"];
+        this.updateBoard();
     }
 
 
@@ -356,25 +363,51 @@ class BoardComponent extends Component {
 
         await this.startTurn();
 
+
         if (waitResponseJson.won == true) {
-            this.quitGame("WON");
+            console.log("???????");
+            this.setState({ youWin: true })
+            await this.noButtonquitgame();
+            this.props.history.push(
+                {
+                    pathname: "/Final",
+                    state: { result: "WON"}
+                }
+            );
+            return;
+
         }
-        if (waitResponseJson.lost == true) {
-            this.quitGame("LOST");
+        if (waitResponseJson.lost == true || testMoveData.length == 0) {
+            this.setState({ youWin: false })
+            await this.noButtonquitgame();
+            this.props.history.push(
+                {
+                    pathname: "/Final",
+                    state: { result: "LOST" }
+                }
+            );
+            return;
         }
 
 
     }
 
 
-    quitGame = (roundResult) => {
+    quitGame = () => {
+        console.log("FREEZE?: " + this.state.freeze);
         if (!this.state.freeze) {
-            let playerNumber = this.props.playerNumber
+            let playerNumber = this.props.location.state.playerNumber
             let data = { player_number: playerNumber };
-            let newResponse = fetch('http://127.0.0.1:5000/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
-            this.props.quitGamePress(roundResult);
+            let newResponse = fetch('http://127.0.0.1:5000/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) // add await?
         }
     }
+
+    async noButtonquitgame() {
+        let playerNumber = this.props.location.state.playerNumber
+        let data = { player_number: playerNumber };
+        let newResponse = await fetch('http://127.0.0.1:5000/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) // add await?
+    }
+
 
 
     clearMoveData = () => {
@@ -407,12 +440,14 @@ class BoardComponent extends Component {
         return isValidSpace;
     }
 
+
     highlightMoveData = (possibleMoves) => {
         //console.log(possibleMoves);
         for (let i = 0; i < possibleMoves.length; i++) {
             this.state.tileComponents[possibleMoves[i][1]][possibleMoves[i][0]].current.highlightOn();
         }
     }
+
 
     turnAllHighlightsOff = () => {
         for (let rowNum = 0; rowNum < 8; rowNum++) {
@@ -421,6 +456,7 @@ class BoardComponent extends Component {
             }
         }
     }
+
 
     // async selectMovement = (clickedCoord) =>
     async selectMovement(clickedCoord) {
@@ -556,13 +592,37 @@ class BoardComponent extends Component {
     render() {
         return (
             <div>
+                <h1>YOU ARE INSIDE THE GAME</h1>
                 <h2>{this.state.turnIndication}</h2>
                 {this.state.htmlBoard}
                 <div>
-                    <ButtonComponent
-                        label={"Quit"}
-                        isPressed={this.quitGame}
-                    />
+
+                    {
+                        this.state.freeze
+
+                            ? <Link to={{
+                                pathname: "/Final",
+                                state: { result: "LOST" },
+                            }} onClick={this.quitGame} disabled={this.state.freeze} className="disabledCursor" onClick={(event) => event.preventDefault()}>
+                                <ButtonComponent
+                                    label={"Quit"}
+                                    disabled={this.state.freeze}
+                                />
+                            </Link>
+
+                            : <Link to={{
+                                pathname: "/Final",
+                                state: { result: "LOST" },
+                            }} onClick={this.quitGame} disabled={this.state.freeze}>
+                                <ButtonComponent
+                                    label={"Quit"}
+                                    disabled={this.state.freeze}
+                                />
+                            </Link>
+                     }
+
+
+
                 </div>
             </div>
             
