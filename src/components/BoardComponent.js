@@ -221,6 +221,8 @@ let conversion = {
 let currentValidMoves = { possibleMoves: [] };
 let currentPiece = '';
 let previousCoord = [];
+let saveClickedCoord = [];
+//let newPromotion = [];
 
 
 class BoardComponent extends Component {
@@ -228,6 +230,7 @@ class BoardComponent extends Component {
         super();
         this.state = {
             freeze: false,
+            isPromote: false,
             tileComponents: [],
             timeToSelect: true,
             timeToMove: false,
@@ -236,7 +239,8 @@ class BoardComponent extends Component {
             currentValidSelections: [],
             currentPiece: '',
             previousCoord: [],
-            youWin: false
+            youWin: false,
+            htmlPlayerColor: null
         };
     }
 
@@ -292,6 +296,7 @@ class BoardComponent extends Component {
 
 
     async componentDidMount() {
+        this.defineWhiteOrBlack();
         if (this.props.location.state.playerNumber == 1) {
             //let selectionsAndMoves = this.processMoveData(this.props.startMoves);
             let selectionsAndMoves = this.processMoveData(this.props.location.state.startMoves);
@@ -319,13 +324,13 @@ class BoardComponent extends Component {
         this.setState({ turnIndication: "Your Turn" })
     }
 
-    //makeMove = (moveData) => 
-    async makeMove(moveData) {
+
+    async makeMove(moveData, isPromotion, promoteTo) {
         if (!this.state.freeze) {
            // console.log("PLAYER NUMBER: " + this.props.playerNumber);
             //this.state.freeze = true;
             this.endTurn();
-            await this.sendBoard(this.props.location.state.playerNumber, moveData);
+            await this.sendBoard(this.props.location.state.playerNumber, moveData, promoteTo);
             await this.makeMoveConnection(this.props.location.state.playerNumber);
         }
         else {
@@ -334,12 +339,14 @@ class BoardComponent extends Component {
     }
 
 
-    async sendBoard(playerNumber, moveData) {
+    async sendBoard(playerNumber, moveData, promoteTo) {
         // send board
         let data = null;
-        data = { player_number: playerNumber, board: boardData, player_move: moveData };
+        data = { player_number: playerNumber, board: boardData, player_move: moveData, pawn_promotion: promoteTo };
         let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
         let newResponseJson = await newResponse.json();
+        console.log("SEND BOARD RETURN vvvvvvv");
+        console.log(newResponseJson);
         boardData = newResponseJson["board_data"];
         this.updateBoard();
     }
@@ -415,6 +422,7 @@ class BoardComponent extends Component {
         currentPiece = '';
         currentValidMoves.possibleMoves = [];
         testMoveData = [];
+        saveClickedCoord = [];
         //console.log(testMoveData);
     }
 
@@ -474,6 +482,31 @@ class BoardComponent extends Component {
                 }
                 else {
                     console.log("made a move!");
+                    console.log(clickedCoord);
+                    saveClickedCoord = clickedCoord
+                    if ((clickedCoord[1] == 0) && (currentPiece == "whitePawn")) {
+                        console.log("WHITE PROMOTION");
+                        this.setState({ isPromote: true });
+                        // changes the core board data
+                        boardData[previousCoord[1]][previousCoord[0]] = "noPiece";
+                        boardData[clickedCoord[1]][clickedCoord[0]] = currentPiece;
+
+                        // actually changes the image
+                        this.updateBoard();
+                        return;
+                    }
+
+                    else if ((clickedCoord[1] == 7) && (currentPiece == "blackPawn")) {
+                        console.log("BLACK PROMOTION");
+                        this.setState({ isPromote: true });
+                        // changes the core board data
+                        boardData[previousCoord[1]][previousCoord[0]] = "noPiece";
+                        boardData[clickedCoord[1]][clickedCoord[0]] = currentPiece;
+
+                        // actually changes the image
+                        this.updateBoard();
+                        return;
+                    }                   
 
                     // changes the core board data
                     boardData[previousCoord[1]][previousCoord[0]] = "noPiece";
@@ -489,7 +522,7 @@ class BoardComponent extends Component {
                     this.clearMoveData();
 
                     // send to server
-                    await this.makeMove(sendToServerMove);
+                    await this.makeMove(sendToServerMove, false, '');
 
 
                 }
@@ -589,26 +622,92 @@ class BoardComponent extends Component {
     }
 
 
+    promoteKnight = () => {
+        console.log("Promoted to Knight!");
+        //newPromotion = [10, 10];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove("knight");
+    }
+
+
+    promoteBishop = () =>  {
+        console.log("Promoted to Bishop!");
+        //newPromotion = [20, 20];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove("bishop");
+    }
+
+
+    promoteRook = () =>  {
+        console.log("Promoted to Rook!");
+        //newPromotion = [30, 30];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove("rook");
+    }
+
+
+    promoteQueen = () =>  {
+        console.log("Promoted to Queen!");
+        //console.log(this.state);
+        //newPromotion = [40, 40];
+        this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
+        this.promotionMove("queen"); // setup await? lookout for this, sketchyy...
+    }
+
+
+    async promotionMove(newPromotion) {
+        // prepare for server using meta data
+        let sendToServerMove = [previousCoord[1], previousCoord[0], saveClickedCoord[1], saveClickedCoord[0]]
+
+        //clears meta board data
+        this.clearMoveData();
+
+        // send to server
+        await this.makeMove(sendToServerMove, true, newPromotion);
+    }
+
+    defineWhiteOrBlack = () => {
+        let label = []
+        if (this.props.location.state.playerNumber == 1) {
+            label.push( <h2 className="youAre">YOU ARE WHITE</h2>);
+        }
+        else {
+            label.push(<h2 className="youAre">YOU ARE BLACK</h2>);
+        }
+        this.setState({ htmlPlayerColor: label });
+    }
+
+    // TODO turn the link into a div and turn into css rather than button 
     render() {
         return (
             <div>
                 <h1>YOU ARE INSIDE THE GAME</h1>
+                {this.state.htmlPlayerColor}
                 <h2>{this.state.turnIndication}</h2>
                 {this.state.htmlBoard}
                 <div>
+                    {
+                        this.state.isPromote
+                            ? <div>
+                                <p>SELECT PIECE TO PROMOTE TO</p>
+                                <table className="promotion">
+                                <tbody>
+                                        <tr className="promotionTr">
+                                            <th className="promotionTh" onClick={this.promoteKnight}>KNIGHT</th>
+                                            <th className="promotionTh" onClick={this.promoteBishop}>BISHOP</th>
+                                            <th className="promotionTh" onClick={this.promoteRook}>ROOK</th>
+                                            <th className="promotionTh" onClick={this.promoteQueen}>QUEEN</th>
+                                        </tr >
+                                </tbody>
+                                </table>
+                                </div>
+                            :<h1></h1>
+                    }
 
                     {
                         this.state.freeze
 
-                            ? <Link to={{
-                                pathname: "/Final",
-                                state: { result: "LOST" },
-                            }} onClick={this.quitGame} disabled={this.state.freeze} className="disabledCursor" onClick={(event) => event.preventDefault()}>
-                                <ButtonComponent
-                                    label={"Quit"}
-                                    disabled={this.state.freeze}
-                                />
-                            </Link>
+                            ? <h2>Waiting For Player...</h2>
 
                             : <Link to={{
                                 pathname: "/Final",
@@ -619,7 +718,8 @@ class BoardComponent extends Component {
                                     disabled={this.state.freeze}
                                 />
                             </Link>
-                     }
+                    }
+
 
 
 
