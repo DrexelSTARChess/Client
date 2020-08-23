@@ -5,7 +5,20 @@ import { createBrowserHistory } from 'history';
 import axios from "axios";
 
 
-class moreInfo extends Component {
+class Final extends Component {
+    constructor() {
+        super();
+        this.state = {
+            result: ""
+        };
+    }
+
+    componentDidMount() {
+        console.log(this.props.location.state.result);
+        console.log(this.props.location);
+        this.setState({ result: this.props.location.state.result})
+    }
+
     returnHome = () => {
         this.props.history.push(
             {
@@ -17,7 +30,7 @@ class moreInfo extends Component {
     render() {
         return (
             <div>
-                <h1>YOU {this.props.won}</h1>
+                <h1>YOU {this.state.result}</h1>
                 <div>
                     <Link to="/"> Back to Home </Link>
                 </div>
@@ -27,4 +40,4 @@ class moreInfo extends Component {
     }
 }
 
-export default moreInfo;
+export default Final;
