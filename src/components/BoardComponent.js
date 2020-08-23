@@ -221,6 +221,7 @@ let conversion = {
 let currentValidMoves = { possibleMoves: [] };
 let currentPiece = '';
 let previousCoord = [];
+let saveClickedCoord = [];
 //let newPromotion = [];
 
 
@@ -323,13 +324,13 @@ class BoardComponent extends Component {
         this.setState({ turnIndication: "Your Turn" })
     }
 
-    //makeMove = (moveData) => 
-    async makeMove(moveData) {
+
+    async makeMove(moveData, isPromotion, promoteTo) {
         if (!this.state.freeze) {
            // console.log("PLAYER NUMBER: " + this.props.playerNumber);
             //this.state.freeze = true;
             this.endTurn();
-            await this.sendBoard(this.props.location.state.playerNumber, moveData);
+            await this.sendBoard(this.props.location.state.playerNumber, moveData, promoteTo);
             await this.makeMoveConnection(this.props.location.state.playerNumber);
         }
         else {
@@ -338,10 +339,10 @@ class BoardComponent extends Component {
     }
 
 
-    async sendBoard(playerNumber, moveData) {
+    async sendBoard(playerNumber, moveData, promoteTo) {
         // send board
         let data = null;
-        data = { player_number: playerNumber, board: boardData, player_move: moveData };
+        data = { player_number: playerNumber, board: boardData, player_move: moveData, pawn_promotion: promoteTo };
         let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
         let newResponseJson = await newResponse.json();
         console.log("SEND BOARD RETURN vvvvvvv");
@@ -421,6 +422,7 @@ class BoardComponent extends Component {
         currentPiece = '';
         currentValidMoves.possibleMoves = [];
         testMoveData = [];
+        saveClickedCoord = [];
         //console.log(testMoveData);
     }
 
@@ -481,6 +483,7 @@ class BoardComponent extends Component {
                 else {
                     console.log("made a move!");
                     console.log(clickedCoord);
+                    saveClickedCoord = clickedCoord
                     if ((clickedCoord[1] == 0) && (currentPiece == "whitePawn")) {
                         console.log("WHITE PROMOTION");
                         this.setState({ isPromote: true });
@@ -519,7 +522,7 @@ class BoardComponent extends Component {
                     this.clearMoveData();
 
                     // send to server
-                    await this.makeMove(sendToServerMove);
+                    await this.makeMove(sendToServerMove, false, '');
 
 
                 }
@@ -623,7 +626,7 @@ class BoardComponent extends Component {
         console.log("Promoted to Knight!");
         //newPromotion = [10, 10];
         this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
-        this.promotionMove([20, 20]);
+        this.promotionMove("knight");
     }
 
 
@@ -631,7 +634,7 @@ class BoardComponent extends Component {
         console.log("Promoted to Bishop!");
         //newPromotion = [20, 20];
         this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
-        this.promotionMove([30, 30]);
+        this.promotionMove("bishop");
     }
 
 
@@ -639,7 +642,7 @@ class BoardComponent extends Component {
         console.log("Promoted to Rook!");
         //newPromotion = [30, 30];
         this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
-        this.promotionMove([40, 40]);
+        this.promotionMove("rook");
     }
 
 
@@ -648,20 +651,19 @@ class BoardComponent extends Component {
         //console.log(this.state);
         //newPromotion = [40, 40];
         this.setState({ isPromote: false }); // setup await? lookout for this, sketchyy...
-        this.promotionMove([50, 50]); // setup await? lookout for this, sketchyy...
+        this.promotionMove("queen"); // setup await? lookout for this, sketchyy...
     }
 
 
     async promotionMove(newPromotion) {
-
         // prepare for server using meta data
-        let sendToServerMove = [previousCoord[1], previousCoord[0], newPromotion[1], newPromotion[0]]
+        let sendToServerMove = [previousCoord[1], previousCoord[0], saveClickedCoord[1], saveClickedCoord[0]]
 
         //clears meta board data
         this.clearMoveData();
 
         // send to server
-        await this.makeMove(sendToServerMove);
+        await this.makeMove(sendToServerMove, true, newPromotion);
     }
 
     defineWhiteOrBlack = () => {
