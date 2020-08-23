@@ -475,13 +475,6 @@ class BoardComponent extends Component {
 
 
     moveLogic = (event, clickedCoord) => {
-        //console.log(this.selectPiece(event, clickedCoord));
-
-        //if (this.state.timeToMove) {
-        //    this.selectMovement(clickedCoord);
-        //    this.state.timeToMove = false;
-        //    return;
-        //}
         if (!this.state.freeze) {
             if (this.selectPiece(event, clickedCoord)) {
                 return;
