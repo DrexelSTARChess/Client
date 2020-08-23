@@ -6,7 +6,20 @@ import axios from "axios";
 
 
 class Home extends Component {
+    constructor() {
+        super();
+        this.state = {
+            waiting: false
+        };
+    }
+
+    componentDidMount() {
+        this.setState({ waiting: false })
+    }
+
+
     startGame = (event) => {
+        this.setState({waiting: true})
         this.simpleConnection();
     }
 
@@ -50,11 +63,14 @@ class Home extends Component {
                 <h1>WELCOME TO CHESS</h1>
                 <p>This is chess!</p>
 
-
-                <ButtonComponent
-                    label={"Start Game"}
-                    isPressed={this.startGame}
-                />
+                {
+                    this.state.waiting
+                        ? <h2>Waiting...</h2>
+                        : <ButtonComponent
+                            label={"Start Game"}
+                            isPressed={this.startGame}
+                        />
+                }
             </div>
         );
     }

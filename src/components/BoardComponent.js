@@ -238,7 +238,8 @@ class BoardComponent extends Component {
             currentValidSelections: [],
             currentPiece: '',
             previousCoord: [],
-            youWin: false
+            youWin: false,
+            htmlPlayerColor: null
         };
     }
 
@@ -294,6 +295,7 @@ class BoardComponent extends Component {
 
 
     async componentDidMount() {
+        this.defineWhiteOrBlack();
         if (this.props.location.state.playerNumber == 1) {
             //let selectionsAndMoves = this.processMoveData(this.props.startMoves);
             let selectionsAndMoves = this.processMoveData(this.props.location.state.startMoves);
@@ -662,11 +664,23 @@ class BoardComponent extends Component {
         await this.makeMove(sendToServerMove);
     }
 
+    defineWhiteOrBlack = () => {
+        let label = []
+        if (this.props.location.state.playerNumber == 1) {
+            label.push( <h2 className="youAre">YOU ARE WHITE</h2>);
+        }
+        else {
+            label.push(<h2 className="youAre">YOU ARE BLACK</h2>);
+        }
+        this.setState({ htmlPlayerColor: label });
+    }
+
     // TODO turn the link into a div and turn into css rather than button 
     render() {
         return (
             <div>
                 <h1>YOU ARE INSIDE THE GAME</h1>
+                {this.state.htmlPlayerColor}
                 <h2>{this.state.turnIndication}</h2>
                 {this.state.htmlBoard}
                 <div>
@@ -685,13 +699,13 @@ class BoardComponent extends Component {
                                 </tbody>
                                 </table>
                                 </div>
-                            :<h1> HELLO </h1>
+                            :<h1></h1>
                     }
 
                     {
                         this.state.freeze
 
-                            ? <p></p>
+                            ? <h2>Waiting For Player...</h2>
 
                             : <Link to={{
                                 pathname: "/Final",
