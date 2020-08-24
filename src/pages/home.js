@@ -14,6 +14,7 @@ class Home extends Component {
     }
 
     componentDidMount() {
+        console.log(process)
         this.setState({ waiting: false })
     }
 
@@ -71,6 +72,7 @@ class Home extends Component {
                             isPressed={this.startGame}
                         />
                 }
+                <Link to="/Info" className="newLink">ABOUT</Link>
             </div>
         );
     }
