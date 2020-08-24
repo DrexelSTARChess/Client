@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import ButtonComponent from '../components/ButtonComponent';
 import { createBrowserHistory } from 'history';
 import axios from "axios";
+import { myConfig } from '../config.js';
 
 
 class Home extends Component {
@@ -14,7 +15,7 @@ class Home extends Component {
     }
 
     componentDidMount() {
-        console.log(process)
+        console.log(myConfig);
         this.setState({ waiting: false })
     }
 
@@ -28,7 +29,7 @@ class Home extends Component {
     async waitForPlayer(data) {
         console.log(data["player_number"]);
         let playerNumber = { player_number: data["player_number"] };
-        let newResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playerNumber) }).then(function (response) {
+        let newResponse = await fetch(myConfig.serverUrl + '/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(playerNumber) }).then(function (response) {
             console.log(response);
         });
         return;
@@ -36,11 +37,11 @@ class Home extends Component {
 
 
     async simpleConnection() {
-        let response = await fetch('http://127.0.0.1:5000/startGame', { method: 'GET' })
+        let response = await fetch(myConfig.serverUrl + '/startGame', { method: 'GET' })
         let data = await response.json();
         let player_number_data = { player_number: data["player_number"] }
         console.log(player_number_data);
-        let waitResponse = await fetch('http://127.0.0.1:5000/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(player_number_data) })
+        let waitResponse = await fetch(myConfig.serverUrl + '/waitForPlayer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(player_number_data) })
         let waitResponseJson = await waitResponse.json();
 
         let startingMoves = waitResponseJson.move_data;
