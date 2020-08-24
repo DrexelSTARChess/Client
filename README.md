@@ -1,3 +1,8 @@
+## STARTING APPLICATION
+make sure to run npm install in client folder
+Adjust the config.js file to point to the correct server (defaulted to 127.0.0.1:5000)
+npm start in client folder to startup application
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## connecting to server
