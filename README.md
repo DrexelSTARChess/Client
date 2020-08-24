@@ -1,5 +1,9 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## connecting to server
+change the url in \client\src\config.js to adjust the server url
+
+
 ## Available Scripts
 
 In the project directory, you can run:

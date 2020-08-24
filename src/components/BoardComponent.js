@@ -4,6 +4,7 @@ import ButtonComponent from '../components/ButtonComponent';
 import { createBrowserHistory } from 'history';
 import { Link } from "react-router-dom";
 import './board.css';
+import { myConfig } from '../config.js';
 
 let whiteKing = '\u2654';
 let whiteQueen = '\u2655';
@@ -344,7 +345,7 @@ class BoardComponent extends Component {
         // send board
         let data = null;
         data = { player_number: playerNumber, board: boardData, player_move: moveData, pawn_promotion: promoteTo };
-        let newResponse = await fetch('http://127.0.0.1:5000/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+        let newResponse = await fetch(myConfig.serverUrl + '/submitBoard', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
         let newResponseJson = await newResponse.json();
         console.log("SEND BOARD RETURN vvvvvvv");
         console.log(newResponseJson);
@@ -357,7 +358,7 @@ class BoardComponent extends Component {
         console.log("YOU HAVE JUST SEND OUT A WAIT RESPONSE FROM THE SERVER AND NOW YOU MUST WAIT");
         // send wait request
         let waitData = { player_number: playerNumber, player_move: [0, 0, 0, 0] };
-        let waitForTurnResponse = await fetch('http://127.0.0.1:5000/waitForTurn', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(waitData) })
+        let waitForTurnResponse = await fetch(myConfig.serverUrl + '/waitForTurn', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(waitData) })
 
         let waitResponseJson = await waitForTurnResponse.json();
         console.log("YOU HAVE RECEIVED A RESPONSE FROM THE SERVER AND NOW IT IS YOUR TURN");
@@ -411,14 +412,14 @@ class BoardComponent extends Component {
         if (!this.state.freeze) {
             let playerNumber = this.props.location.state.playerNumber
             let data = { player_number: playerNumber };
-            let newResponse = fetch('http://127.0.0.1:5000/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) // add await?
+            let newResponse = fetch(myConfig.serverUrl + '/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) // add await?
         }
     }
 
     async noButtonquitgame() {
         let playerNumber = this.props.location.state.playerNumber
         let data = { player_number: playerNumber };
-        let newResponse = await fetch('http://127.0.0.1:5000/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) // add await?
+        let newResponse = await fetch(myConfig.serverUrl + '/quitGame', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }) // add await?
     }
 
 
